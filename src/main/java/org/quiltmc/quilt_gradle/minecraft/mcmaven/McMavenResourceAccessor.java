@@ -1,6 +1,5 @@
 package org.quiltmc.quilt_gradle.minecraft.mcmaven;
 
-import org.quiltmc.quilt_gradle.minecraft.MinecraftMaven;
 import org.quiltmc.quilt_gradle.util.io.FileUtils;
 import org.gradle.api.resources.ResourceException;
 import org.gradle.internal.hash.HashCode;

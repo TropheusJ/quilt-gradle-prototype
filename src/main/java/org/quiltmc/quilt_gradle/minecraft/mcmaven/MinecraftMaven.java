@@ -1,6 +1,6 @@
-package org.quiltmc.quilt_gradle.minecraft;
+package org.quiltmc.quilt_gradle.minecraft.mcmaven;
 
-import com.google.common.base.Suppliers;
+import org.quiltmc.quilt_gradle.minecraft.Side;
 import org.quiltmc.quilt_gradle.minecraft.pistonmeta.FullVersion;
 import org.quiltmc.quilt_gradle.minecraft.pistonmeta.FullVersion.Artifact;
 import org.quiltmc.quilt_gradle.minecraft.pistonmeta.FullVersion.Features;
@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
