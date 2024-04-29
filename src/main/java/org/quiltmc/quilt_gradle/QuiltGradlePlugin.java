@@ -11,6 +11,8 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.dsl.DependencyHandler;
 import org.gradle.api.internal.artifacts.repositories.transport.RepositoryTransportFactory;
+import org.quiltmc.quilt_gradle.remapping.ext.MappingsExtension;
+import org.quiltmc.quilt_gradle.remapping.ext.MappingsExtensionImpl;
 
 import javax.inject.Inject;
 
@@ -42,32 +44,16 @@ public abstract class QuiltGradlePlugin implements Plugin<Project> {
             repo.setUrl(URI.create("mcmaven:///"));
         });
 
-		// Set up the remapping transforms
+		// Set up remapping
 		DependencyHandler dependencies = project.getDependencies();
 		// register the attribute
 		dependencies.getAttributesSchema().attribute(RemapTransform.MAPPINGS);
-		// register the transform itself
-		dependencies.registerTransform(RemapTransform.class, spec -> {
-			spec.getFrom().attribute(RemapTransform.MAPPINGS, "obfuscated");
-			spec.getTo().attribute(RemapTransform.MAPPINGS, "mojmap");
-			spec.getParameters().getMappingsFile().set(project.file("client.txt"));
-		});
-		// all jar artifacts have mappings set to obfuscated
-		dependencies.getArtifactTypes().getByName("jar").getAttributes()
-				.attribute(RemapTransform.MAPPINGS, "obfuscated");
-
-		// request all dependencies to be in mojmap
-		project.getConfigurations().configureEach(configuration -> {
-			if (configuration.isCanBeResolved()) {
-				configuration.getAttributes().attribute(RemapTransform.MAPPINGS, "mojmap");
-			}
-		});
-
-
-
-		//
-		dependencies.getComponents().all(details -> details.allVariants(variant -> variant.withDependencies(deps -> {
-//			deps.add("net.minecraft:minecraft-client:1.20.4");
-		})));
+		// configuration for mappings files
+		project.getConfigurations().create("mappings");
+		// extension for adding mappings and remapped dependencies
+		dependencies.getExtensions().create(
+				MappingsExtension.class, "mappings", MappingsExtensionImpl.class,
+				dependencies
+		);
 	}
 }

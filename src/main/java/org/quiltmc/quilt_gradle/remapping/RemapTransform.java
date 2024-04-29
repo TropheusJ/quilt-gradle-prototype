@@ -2,6 +2,7 @@ package org.quiltmc.quilt_gradle.remapping;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import net.fabricmc.mappingio.MappingReader;
 import net.fabricmc.mappingio.tree.MemoryMappingTree;
@@ -25,7 +26,7 @@ import org.quiltmc.quilt_gradle.remapping.RemapTransform.Params;
 import org.quiltmc.quilt_gradle.util.TinyRewrapper;
 
 public abstract class RemapTransform implements TransformAction<Params> {
-	public static final Attribute<String> MAPPINGS = Attribute.of("mappings", String.class);
+	public static final Attribute<String> MAPPINGS = Attribute.of("org.quiltmc.quilt_gradle.mappings", String.class);
 
 	@InputArtifact
 	public abstract Provider<FileSystemLocation> getInput();
@@ -37,10 +38,19 @@ public abstract class RemapTransform implements TransformAction<Params> {
 	public void transform(TransformOutputs outputs) {
 		File input = this.getInput().get().getAsFile();
 		String name = input.getName();
-		if (!name.contains("minecraft"))
-			return;
+		System.out.println("remapping " + name + "\n" + "Dependencies: " +
+				this.getDependencies().getFiles().stream().map(File::getName).toList());
+
 		String outputName = jarless(name) + "-remapped.jar";
 		File output = outputs.file(outputName);
+
+		try {
+			Files.copy(input.toPath(), output.toPath());
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		if (true) return;
 
 		try (TinyRewrapper rewrapper = this.createRemapper(); OutputConsumerPath remapOutput = new Builder(output.toPath()).build()) {
 			TinyRemapper remapper = rewrapper.remapper();
@@ -63,7 +73,7 @@ public abstract class RemapTransform implements TransformAction<Params> {
 	}
 
 	private TinyRewrapper createRemapper() {
-		File mappings = this.getParameters().getMappingsFile().get();
+		File mappings = null;//this.getParameters().getMappingsFile().get();
 		MemoryMappingTree tree = new MemoryMappingTree();
 		try {
 			MappingReader.read(mappings.toPath(), tree);
@@ -77,7 +87,7 @@ public abstract class RemapTransform implements TransformAction<Params> {
 	}
 
 	public abstract static class Params implements TransformParameters {
-		@Input
-		public abstract Property<File> getMappingsFile();
+//		@Input
+//		public abstract Property<File> getMappingsFile();
 	}
 }
