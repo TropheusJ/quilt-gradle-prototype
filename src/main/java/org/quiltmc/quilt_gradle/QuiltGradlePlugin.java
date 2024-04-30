@@ -5,7 +5,7 @@ import java.net.URI;
 import org.quiltmc.quilt_gradle.extension.QuiltExtension;
 import org.quiltmc.quilt_gradle.extension.QuiltExtensionImpl;
 import org.quiltmc.quilt_gradle.minecraft.mcmaven.McMavenConnectorFactory;
-import org.quiltmc.quilt_gradle.remapping.RemapTransform;
+import org.quiltmc.quilt_gradle.remapping.MappingsAttribute;
 
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -47,7 +47,8 @@ public abstract class QuiltGradlePlugin implements Plugin<Project> {
 		// Set up remapping
 		DependencyHandler dependencies = project.getDependencies();
 		// register the attribute
-		dependencies.getAttributesSchema().attribute(RemapTransform.MAPPINGS);
+		MappingsAttribute.init(dependencies.getAttributesSchema());
+
 		// configuration for mappings files
 		project.getConfigurations().create("mappings");
 		// extension for adding mappings and remapped dependencies

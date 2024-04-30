@@ -15,19 +15,14 @@ import org.gradle.api.artifacts.transform.InputArtifactDependencies;
 import org.gradle.api.artifacts.transform.TransformAction;
 import org.gradle.api.artifacts.transform.TransformOutputs;
 import org.gradle.api.artifacts.transform.TransformParameters;
-import org.gradle.api.attributes.Attribute;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.file.FileSystemLocation;
-import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
-import org.gradle.api.tasks.Input;
 
 import org.quiltmc.quilt_gradle.remapping.RemapTransform.Params;
 import org.quiltmc.quilt_gradle.util.TinyRewrapper;
 
 public abstract class RemapTransform implements TransformAction<Params> {
-	public static final Attribute<String> MAPPINGS = Attribute.of("org.quiltmc.quilt_gradle.mappings", String.class);
-
 	@InputArtifact
 	public abstract Provider<FileSystemLocation> getInput();
 
