@@ -7,8 +7,6 @@ import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.artifacts.ModuleDependency;
 import org.gradle.api.artifacts.dsl.DependencyHandler;
 
-import org.quiltmc.quilt_gradle.remapping.MappingsAttribute;
-import org.quiltmc.quilt_gradle.remapping.RemapTransform;
 import org.quiltmc.quilt_gradle.remapping.settings.RemapSettings;
 import org.quiltmc.quilt_gradle.remapping.settings.RemapSettingsImpl;
 
@@ -26,15 +24,6 @@ public class MappingsExtensionImpl implements MappingsExtension {
     @Override
     public void addMappings(String fromNamespace, String toNamespace, Object notation) {
         Dependency dep = this.deps.add("mappings", notation);
-
-        System.out.println("registering transform " + fromNamespace + " to " + toNamespace);
-
-        // register a transform
-        this.deps.registerTransform(RemapTransform.class, spec -> {
-            spec.getFrom().attribute(MappingsAttribute.INSTANCE, fromNamespace);
-            spec.getTo().attribute(MappingsAttribute.INSTANCE, toNamespace);
-//            spec.getParameters().getMappingsFile().set(new File("aaa"));
-        });
     }
 
     @Override
@@ -67,19 +56,6 @@ public class MappingsExtensionImpl implements MappingsExtension {
 
         RemapSettingsImpl settings = new RemapSettingsImpl(this.defaultSourceMappings, this.minecraftDependency);
         action.execute(settings);
-
-        // set the requested mappings
-        dep.attributes(attributes -> attributes.attribute(MappingsAttribute.INSTANCE, this.targetMapppings));
-
-        // modify metadata
-        String module = dep.getGroup() + ':' + dep.getName();
-        deps.getComponents().withModule(module, metadata -> metadata.allVariants(variant -> {
-            // set the source mappings
-            variant.attributes(attrs -> attrs.attribute(MappingsAttribute.INSTANCE, settings.sourceMappings));
-            // add remap context to dependencies so that it's present in the transform
-            // Minecraft is included by default
-            variant.withDependencies(dependencies -> settings.remapContext.forEach(dependencies::add));
-        }));
 
         return dep;
     }

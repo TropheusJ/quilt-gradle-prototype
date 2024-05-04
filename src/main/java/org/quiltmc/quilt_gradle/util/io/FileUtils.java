@@ -3,6 +3,7 @@ package org.quiltmc.quilt_gradle.util.io;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -70,5 +71,14 @@ public class FileUtils {
             Files.createDirectories(file.getParent());
             Files.createFile(file);
         }
+    }
+
+    public static String suffixed(String filename, String suffix) {
+        int lastDot = filename.lastIndexOf('.');
+        if (lastDot == -1)
+            return filename + suffix;
+        String name = filename.substring(0, lastDot);
+        String ext = filename.substring(lastDot);
+        return name + suffix + ext;
     }
 }

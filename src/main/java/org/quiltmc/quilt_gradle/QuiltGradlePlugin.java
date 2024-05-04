@@ -2,10 +2,12 @@ package org.quiltmc.quilt_gradle;
 
 import java.net.URI;
 
+import org.gradle.api.artifacts.ConfigurationContainer;
+import org.gradle.api.tasks.TaskContainer;
+import org.gradle.api.tasks.TaskProvider;
 import org.quiltmc.quilt_gradle.extension.QuiltExtension;
 import org.quiltmc.quilt_gradle.extension.QuiltExtensionImpl;
 import org.quiltmc.quilt_gradle.minecraft.mcmaven.McMavenConnectorFactory;
-import org.quiltmc.quilt_gradle.remapping.MappingsAttribute;
 
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -13,6 +15,7 @@ import org.gradle.api.artifacts.dsl.DependencyHandler;
 import org.gradle.api.internal.artifacts.repositories.transport.RepositoryTransportFactory;
 import org.quiltmc.quilt_gradle.remapping.ext.MappingsExtension;
 import org.quiltmc.quilt_gradle.remapping.ext.MappingsExtensionImpl;
+import org.quiltmc.quilt_gradle.remapping.task.RemapClasspath;
 
 import javax.inject.Inject;
 
@@ -46,15 +49,21 @@ public abstract class QuiltGradlePlugin implements Plugin<Project> {
 
 		// Set up remapping
 		DependencyHandler dependencies = project.getDependencies();
-		// register the attribute
-		MappingsAttribute.init(dependencies.getAttributesSchema());
 
 		// configuration for mappings files
-		project.getConfigurations().create("mappings");
+		ConfigurationContainer configurations = project.getConfigurations();
+		configurations.create("mappings");
 		// extension for adding mappings and remapped dependencies
 		dependencies.getExtensions().create(
 				MappingsExtension.class, "mappings", MappingsExtensionImpl.class,
 				dependencies
 		);
+		TaskContainer tasks = project.getTasks();
+		TaskProvider<RemapClasspath> task = tasks.register("remapCompileClasspath", RemapClasspath.class);
+		task.configure(t -> {
+			t.getClasspath().set(configurations.getByName("compileClasspath"));
+			t.getMappingFile().set(configurations.getByName("mappings").getSingleFile());
+		});
+		tasks.named("compileJava").configure(t -> t.dependsOn(task));
 	}
 }

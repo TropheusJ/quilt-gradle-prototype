@@ -8,14 +8,13 @@ version = "1.0-SNAPSHOT"
 repositories {
     mavenCentral()
     maven("https://libraries.minecraft.net")
-    maven("https://maven.fabricmc.net")
+    maven("https://maven.neoforged.net")
 }
 
 dependencies {
     implementation("com.mojang:datafixerupper:7.0.13")
     implementation("com.google.code.gson:gson:2.10.1")
-    implementation("net.fabricmc:tiny-remapper:0.10.2")
-    implementation("net.fabricmc:mapping-io:0.6.1")
+    implementation("net.neoforged:AutoRenamingTool:2.0.3")
 }
 
 gradlePlugin {
